@@ -41,7 +41,69 @@ def scrape_kicker_prognose():
     return tips
 
 def scrape_bundesliga_prognose():
+   
     url = "https://www.bundesliga-prognose.de/"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36"
+    }
+
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    tipps = []
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Suche das th mit data-field="platz"
+        th_tag = soup.find('th', {'data-field': 'platz'})
+
+        if th_tag:
+            # Zum <table> Element hochgehen
+            table = th_tag.find_parent('table')
+
+            # <tbody> finden
+            tbody = table.find('tbody')
+
+            # Durch alle <tr> im <tbody>
+            for row in tbody.find_all('tr'):
+                cells = row.find_all('td')
+
+                if len(cells) >= 6:
+                    datum = cells[0].get_text(strip=True)
+                    anstosszeit = cells[1].get_text(strip=True)
+                    heimteam = cells[2].get_text(strip=True)
+                    heimtea_short_name = cells[3].get_text(strip=True)
+                    auswärtsteam = cells[4].get_text(strip=True).lstrip("- ").strip()
+                    auswärtsteam_short_name = cells[5].get_text(strip=True)                                    
+                    ergebnis = cells[6].get_text(strip=True)
+                    tipp = cells[7].get_text(strip=True)
+
+                    # Nur rot markierte Tipps extrahieren
+                    if 'color: red' in cells[7].get('style', ''):
+                        tipps.append({
+                            'datum': datum,
+                            'anstosszeit': anstosszeit,
+                            'heimteam': heimteam,
+                            'auswärtsteam': auswärtsteam,
+                            'ergebnis': ergebnis,
+                            'tipp': tipp
+                        })
+
+            # Ausgabe der Ergebnisse
+            
+        else:
+            print("https://www.bundesliga-prognose.de nicht erreichbar")
+
+    return tipps
+
+
+def scrape_buli_tipphilfe():
+    url = "https://www.buli-tipphilfe.de/"
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -52,54 +114,64 @@ def scrape_bundesliga_prognose():
     response = requests.get(url, headers=headers)
     response.raise_for_status()
 
-    soup = BeautifulSoup(response.content, "html.parser")
+    tipps = []
 
-    # Wir suchen nach allen Tabellen auf der Seite
-    tables = soup.find_all("table")
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, 'html.parser')
+        bundesliga_section = soup.find(id="pills-Bundesliga1")
 
-    tips = []
+        if bundesliga_section:
+            # Wir holen alle sichtbaren Zeilen – die Struktur von oben nach unten
+            rows = bundesliga_section.find_all("div", class_="row border-bottom", recursive=True)
 
-    # Gehe durch jede Tabelle und prüfe, ob sie die gesuchten Tipps enthält
-    for table in tables:
-        # Prüfen, ob die Tabelle Zeilen enthält, die uns interessieren
-        tbody = table.find("tbody")
-        if tbody:
-            # Gehe durch jede Zeile der Tabelle
-            for row in tbody.find_all("tr"):
-                cells = row.find_all("td")
-                if len(cells) >= 6:  # Wenn die Zeile genügend Zellen hat
-                    date = cells[0].get_text(strip=True)
-                    time = cells[1].get_text(strip=True)
-                    home_team = cells[2].get_text(strip=True)
-                    away_team = cells[3].get_text(strip=True)
-                    result = cells[4].get_text(strip=True)
-                    tip = cells[5].get_text(strip=True)
+            for row in rows:
+                # Schritt 1: Begegnung finden
+                match_div = row.find("div", string=lambda text: text and ":" in text)
+                if not match_div:
+                    continue
 
-                    # Nur Zeilen mit einem roten Tipp (style="color: red") berücksichtigen
-                    if 'color: red' in str(cells[5]):
-                        tips.append({
-                            "date": date,
-                            "time": time,
-                            "home_team": home_team,
-                            "away_team": away_team,
-                            "result": result,
-                            "tip": tip
-                        })
-    return tips
+                match_text = match_div.get_text(strip=True)
+                if ":" not in match_text:
+                    continue
+
+                heim, auswaerts = [t.strip() for t in match_text.split(":", 1)]
+
+                # Schritt 2: TIPP suchen innerhalb des gleichen Blocks
+                tipp = None
+                all_divs = row.find_all("div")
+                for i, div in enumerate(all_divs):
+                    if div.get_text(strip=True).upper() == "TIPP":
+                        if i + 1 < len(all_divs):
+                            tipp = all_divs[i + 1].get_text(strip=True)
+                            break
+
+                tipps.append({
+                    "heimteam": heim,
+                    "auswaertsteam": auswaerts,
+                    "tipp": tipp
+                })
+
+    return tipps
    
 
 if __name__ == "__main__":
 
     all_tipps = []
 
-    # kicker_tipps = scrape_kicker_prognose()
-    # all_tipps.append(kicker_tipps)
+    kicker_tipps = scrape_kicker_prognose()
+    bundesliga_tipps = scrape_bundesliga_prognose()    
+    buli_tipphilfe_tipps = scrape_buli_tipphilfe()
+
+    all_tipps.append( kicker_tipps, bundesliga_tipps, buli_tipphilfe_tipps)
    
-    bundesliga_tipps = scrape_bundesliga_prognose()
-    for t in bundesliga_tipps:
-       print(f"{t['date']} {t['time']}: {t['home_team']} vs. {t['away_team']} -> {t['tip']} (Ergebnis: {t['result']})")
 
 
+#    for tipp in scrape_buli_tipphilfe():
+#        print(f"{tipp['heimteam']} vs {tipp['auswaertsteam']} -> Tipp: {tipp['tipp']}")
+
+ 
+#    for tipp in bundesliga_tipps:
+#                print(f"{tipp['heimteam']} vs. {tipp['auswärtsteam']} : {tipp['tipp']}")
 
 #    for t in kicker_tipps:
 #        print(f"{t['match']}: {t['tip']}")
