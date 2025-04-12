@@ -102,7 +102,7 @@ def scrape_bundesliga_prognose():
     return tipps
 
 
-def scrape_buli_tipphilfe():
+def scrape_buli_tipphilfe_prognose():
     url = "https://www.buli-tipphilfe.de/"
 
     headers = {
@@ -160,11 +160,13 @@ if __name__ == "__main__":
 
     kicker_tipps = scrape_kicker_prognose()
     bundesliga_tipps = scrape_bundesliga_prognose()    
-    buli_tipphilfe_tipps = scrape_buli_tipphilfe()
+    buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
 
-    all_tipps.append( kicker_tipps, bundesliga_tipps, buli_tipphilfe_tipps)
-   
-
+    all_tipps.append( kicker_tipps)
+    all_tipps.append( bundesliga_tipps)
+    all_tipps.append( buli_tipphilfe_tipps)
+    
+    print("Done")
 
 #    for tipp in scrape_buli_tipphilfe():
 #        print(f"{tipp['heimteam']} vs {tipp['auswaertsteam']} -> Tipp: {tipp['tipp']}")
