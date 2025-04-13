@@ -89,12 +89,22 @@ def scrape_kicker_prognose():
             continue
 
         title = h2.get_text(strip=True)
+        if "vs." in title:
+            parts = title.split("vs.")
+            home_team = parts[0].strip()
+            away_team = parts[1].strip()
+
         next_strong = h2.find_next("strong")
         if next_strong and "Unser Tipp:" in next_strong.get_text():
             tipp_text = next_strong.get_text(strip=True).replace("Unser Tipp:", "").strip()
             tips.append({
+                "date": "",
+                "kickoff_time": "",
+                "home_team": home_team, 
+                "away_team": away_team,
                 "match": title,
-                "tip": tipp_text
+                "tip": tipp_text,
+                "result": ""
             })
 
     return tips
@@ -133,24 +143,24 @@ def scrape_bundesliga_prognose():
                 cells = row.find_all('td')
 
                 if len(cells) >= 6:
-                    datum = cells[0].get_text(strip=True)
-                    anstosszeit = cells[1].get_text(strip=True)
-                    heimteam = cells[2].get_text(strip=True)
+                    date = cells[0].get_text(strip=True)
+                    kickoff_time = cells[1].get_text(strip=True)
+                    home_team = cells[2].get_text(strip=True)
                     heimtea_short_name = cells[3].get_text(strip=True)
-                    auswärtsteam = cells[4].get_text(strip=True).lstrip("- ").strip()
+                    away_team = cells[4].get_text(strip=True).lstrip("- ").strip()
                     auswärtsteam_short_name = cells[5].get_text(strip=True)                                    
-                    ergebnis = cells[6].get_text(strip=True)
-                    tipp = cells[7].get_text(strip=True)
+                    result = cells[6].get_text(strip=True)
+                    tip = cells[7].get_text(strip=True)
 
                     # Nur rot markierte Tipps extrahieren
                     if 'color: red' in cells[7].get('style', ''):
                         tipps.append({
-                            'datum': datum,
-                            'anstosszeit': anstosszeit,
-                            'heimteam': heimteam,
-                            'auswärtsteam': auswärtsteam,
-                            'ergebnis': ergebnis,
-                            'tipp': tipp
+                            'home_team': home_team,
+                            'away_team': away_team,
+                            'tip': tip, 
+                            'date': date,
+                            'kickoff_time': kickoff_time,
+                            'result': result
                         })
 
             # Ausgabe der Ergebnisse
@@ -291,10 +301,142 @@ def scrape_ninety_min_prognose(current_matchday, current_saison):
 
     return tipps
 
-def create_match_object():
-    match_1= Match("HSV", "Schalke 04", "3:1")
-    print(match_1)
-    
+def create_match_objects_by_tip_list(tip_list):
+
+    erste_bundesliga_teams=[
+        "FC Bayern München", 
+        "Bayer 04 Leverkusen",
+        "Eintracht Frankfurt",
+        "RB Leipzig",
+        "1.FSV Mainz 05",
+        "SC Freiburg",
+        "Bor. Mönchengladbach",
+        "Borussia Dortmund",
+        "FC Augsburg",
+        "VfB Stuttgart",
+        "SV Werder Bremen",
+        "VfL Wolfsburg",
+        "1.FC Union Berlin",
+        "TSG Hoffenheim",
+        "FC St. Pauli",
+        "1.FC Heidenheim",
+        "VfL Bochum",
+        "Holstein Kiel"
+    ]
+
+    match_objects = []
+
+    for tip in tip_list:
+
+        # if "" in tip["home_team"]:
+        #     tip["home_team"] = ""
+        # if "" in tip["away_team"]:
+        #     tip["away_team"] = ""
+
+        if "Augsburg" in tip["home_team"]:
+            tip["home_team"] = "FC Augsburg"
+        if "Augsburg" in tip["away_team"]:
+            tip["away_team"] = "FC Augsburg"
+
+        if "Bayern" in tip["home_team"]:
+            tip["home_team"] = "FC Bayern München"
+        if "Bayern" in tip["away_team"]:
+            tip["away_team"] = "FC Bayern München"
+
+        if "Bochum" in tip["home_team"]:
+            tip["home_team"] = "VfL Bochum"
+        if "Bochum" in tip["away_team"]:
+            tip["away_team"] = "VfL Bochum"
+
+        if "Bremen" in tip["home_team"]:
+            tip["home_team"] = "SV Werder Bremen"
+        if "Bremen" in tip["away_team"]:
+            tip["away_team"] = "SV Werder Bremen"
+
+        if "Dortmund" in tip["home_team"]:
+            tip["home_team"] = "Borussia Dortmund"
+        if "Dortmund" in tip["away_team"]:
+            tip["away_team"] = "Borussia Dortmund"
+
+        if "Frankfurt" in tip["home_team"]:
+            tip["home_team"] = "Eintracht Frankfurt"
+        if "Frankfurt" in tip["away_team"]:
+            tip["away_team"] = "Eintracht Frankfurt"
+
+        if "Freiburg" in tip["home_team"]:
+            tip["home_team"] = "SC Freiburg"
+        if "Freiburg" in tip["away_team"]:
+            tip["away_team"] = "SC Freiburg"
+
+        if "Gladbach" in tip["home_team"]:
+            tip["home_team"] = "Bor. Mönchengladbach"
+        if "Gladbach" in tip["away_team"]:
+            tip["away_team"] = "Bor. Mönchengladbach"
+        
+        if "Heidenheim" in tip["home_team"]:
+            tip["home_team"] = "1.FC Heidenheim"
+        if "Heidenheim" in tip["away_team"]:
+            tip["away_team"] = "1.FC Heidenheim"
+
+        if "Hoffenheim" in tip["home_team"]:
+            tip["home_team"] = "TSG Hoffenheim"
+        if "Hoffenheim" in tip["away_team"]:
+            tip["away_team"] = "TSG Hoffenheim"
+
+        if "Kiel" in tip["home_team"]:
+            tip["home_team"] = "Holstein Kiel"
+        if "Kiel" in tip["away_team"]:
+            tip["away_team"] = "Holstein Kiel"
+        
+        if "Leipzig" in tip["home_team"]:
+            tip["home_team"] = "RB Leipzig"
+        if "Leipzig" in tip["away_team"]:
+            tip["away_team"] = "RB Leipzig"
+
+        if "Leverkusen" in tip["home_team"]:
+            tip["home_team"] = "Bayer 04 Leverkusen"
+        if "Leverkusen" in tip["away_team"]:
+            tip["away_team"] = "Bayer 04 Leverkusen"
+
+        if "Mainz" in tip["home_team"]:
+            tip["home_team"] = "1.FSV Mainz 05"
+        if "Mainz" in tip["away_team"]:
+            tip["away_team"] = "1.FSV Mainz 05"
+
+        if "Pauli" in tip["home_team"]:
+            tip["home_team"] = "FC St. Pauli"
+        if "Pauli" in tip["away_team"]:
+            tip["away_team"] = "FC St. Pauli"
+
+        if "Stuttgart" in tip["home_team"]:
+            tip["home_team"] = "VfB Stuttgart"
+        if "Stuttgart" in tip["away_team"]:
+            tip["away_team"] = "VfB Stuttgart"
+        
+        if "Union" in tip["home_team"]:
+            tip["home_team"] = "1.FC Union Berlin"
+        if "Union" in tip["away_team"]:
+            tip["away_team"] = "1.FC Union Berlin"
+
+        if "Wolfsburg" in tip["home_team"]:
+            tip["home_team"] = "VfL Wolfsburg"
+        if "Wolfsburg" in tip["away_team"]:
+            tip["away_team"] = "VfL Wolfsburg"
+     
+
+
+        if tip["home_team"] not in erste_bundesliga_teams:
+            print(f'Home Team not found: {tip["home_team"]}')
+        if tip["away_team"] not in erste_bundesliga_teams:
+            print(f'Away Team not found: {tip["away_team"]}')
+
+        match = Match(tip["home_team"], tip["away_team"], tip["tip"], tip["date"], tip["kickoff_time"], tip["result"] )
+        match_objects.append(match)
+
+    return match_objects
+
+
+
 if __name__ == "__main__":
 
     #matchday_and_season_short = get_current_matchday_and_season()
@@ -303,36 +445,20 @@ if __name__ == "__main__":
 
     all_tipps = []
 
-    kicker_tipps = scrape_kicker_prognose()
     bundesliga_tipps = scrape_bundesliga_prognose()    
-    buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
-    sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
-    ninety_min_tipps = scrape_ninety_min_prognose(current_matchday, current_saison)
+    kicker_tipps = scrape_kicker_prognose()
+    # buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
+    # sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
+    # ninety_min_tipps = scrape_ninety_min_prognose(current_matchday, current_saison)
 
-    all_tipps.append(kicker_tipps)
-    all_tipps.append(bundesliga_tipps)
-    all_tipps.append(buli_tipphilfe_tipps)   
-    all_tipps.append(sportwettenvergleich_tipps)
-    all_tipps.append(ninety_min_tipps)
+    # all_tipps.append(kicker_tipps)
+    # all_tipps.append(bundesliga_tipps)
+    # all_tipps.append(buli_tipphilfe_tipps)   
+    # all_tipps.append(sportwettenvergleich_tipps)
+    # all_tipps.append(ninety_min_tipps)
 
-    match_x = create_match_object()
+    A_bundesliga_tip_objects = create_match_objects_by_tip_list(bundesliga_tipps)
+    B_kicker_tip_objects = create_match_objects_by_tip_list(kicker_tipps)
 
     print("done.")
     
-    #print(current_matchday,current_saison)
-
-#    for match, tip in ninety_min_tipps:
-#        print(f"Spiel: {match} - Tipp: {tip}")
-
-
-#    for tipp in sportwettenvergleich_tipps:
-#        print(tipp)
-    
-#    for tipp in scrape_buli_tipphilfe():
-#        print(f"{tipp['heimteam']} vs {tipp['auswaertsteam']} -> Tipp: {tipp['tipp']}")
-
-#    for tipp in bundesliga_tipps:
-#                print(f"{tipp['heimteam']} vs. {tipp['auswärtsteam']} : {tipp['tipp']}")
-
-#    for t in kicker_tipps:
-#        print(f"{t['match']}: {t['tip']}")
