@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+import re
 
 
 def scrape_kicker_prognose():
@@ -152,26 +153,159 @@ def scrape_buli_tipphilfe_prognose():
                 })
 
     return tipps
-   
+
+def scrape_sportwettenvergleich_prognose():
+    url  = "https://www.sportwettenvergleich.net/kickform/bundesliga-spieltagstipps"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36"
+    }
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    tipps = []
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        # Alle divs mit class 'matchday' holen
+        matchday_divs = soup.find_all("div", class_="matchday")
+
+        for div in matchday_divs:
+            # Sicherstellen, dass es sich **nicht** um das <section> handelt
+            if div.name != "section":
+                ul = div.find("ul")
+                if not ul:
+                    continue
+
+                for li in ul.find_all("li"):
+                    date_elem = li.find("small")
+                    date = date_elem.text.strip() if date_elem else "Unbekanntes Datum"
+
+                    left_team_elem = li.find("strong", class_="left")
+                    left_team = left_team_elem.text.strip() if left_team_elem else "?"
+
+                    right_team_elem = li.find("strong", class_="right")
+                    right_team = right_team_elem.text.strip() if right_team_elem else "?"
+
+                    score_elem = li.find("span", class_="score_sidebar played") or li.find("span", class_="score_sidebar")
+                    score = score_elem.text.strip() if score_elem else "?"
+
+                    match_str = f"{date}: {left_team} - {right_team} {score}"
+                    tipps.append(match_str)
+
+    return tipps
+
+def scrape_ninetymin_prognose():
+    url  = "https://www.90min.de/bundesliga-prognose-vorhersage-tipps-zum-14-spieltag-24-25"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36"
+    }
+
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    
+    tipps = []
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+
+    return False
+
+def get_current_matchday():
+    url = "https://www.kicker.de/bundesliga/spieltag"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36"
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    current_matchday = "matchday not found"
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+
+        matchday_option = soup.find_all("option", selected=True)[1]  # Zweiter 'selected'
+        if not matchday_option:
+            raise Exception("Spieltag-Option nicht gefunden.")
+
+        # Spieltag extrahieren
+        spieltag_match = re.search(r"(\d+)\. Spieltag", matchday_option.text.strip())
+        if not spieltag_match:
+            raise Exception("Spieltag konnte nicht extrahiert werden.")
+
+        current_matchday = int(spieltag_match.group(1))
+
+    return current_matchday
+            
+
+def get_current_season():
+    url = "https://www.kicker.de/bundesliga/spieltag"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                      "AppleWebKit/537.36 (KHTML, like Gecko) "
+                      "Chrome/122.0.0.0 Safari/537.36"
+    }
+    
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+
+    saison = 'saison not found'
+
+    if response.status_code == 200:
+        soup = BeautifulSoup(response.text, "html.parser")
+        season_option = soup.find("option", selected=True)
+        if not season_option:
+            raise Exception("Saison-Option nicht gefunden.")
+
+        # Saison extrahieren
+        saison_full = season_option["value"].split("/")[-1]  # z.B. "2024-25"
+        saison_kurz = saison_full[-5:]  # sichergehen: "24-25"
+        saison = saison_kurz
+
+    return saison
+    
+
 
 if __name__ == "__main__":
 
-    all_tipps = []
+    #matchday_and_season_short = get_current_matchday_and_season()
+    current_saison = get_current_season()
+    current_matchday = get_current_matchday()
 
-    kicker_tipps = scrape_kicker_prognose()
-    bundesliga_tipps = scrape_bundesliga_prognose()    
-    buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
+    # all_tipps = []
 
-    all_tipps.append( kicker_tipps)
-    all_tipps.append( bundesliga_tipps)
-    all_tipps.append( buli_tipphilfe_tipps)
+    # kicker_tipps = scrape_kicker_prognose()
+    # bundesliga_tipps = scrape_bundesliga_prognose()    
+    # buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
+    # sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
+    # ninetymin_tipps = scrape_ninetymin_prognose()
+
+    # all_tipps.append( kicker_tipps)
+    # all_tipps.append( bundesliga_tipps)
+    # all_tipps.append( buli_tipphilfe_tipps)   
+    # all_tipps.append(sportwettenvergleich_tipps)
     
-    print("Done")
+    print(current_matchday,current_saison)
 
+
+#    for tipp in sportwettenvergleich_tipps:
+#        print(tipp)
+    
 #    for tipp in scrape_buli_tipphilfe():
 #        print(f"{tipp['heimteam']} vs {tipp['auswaertsteam']} -> Tipp: {tipp['tipp']}")
 
- 
 #    for tipp in bundesliga_tipps:
 #                print(f"{tipp['heimteam']} vs. {tipp['auswärtsteam']} : {tipp['tipp']}")
 
