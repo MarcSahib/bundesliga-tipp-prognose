@@ -255,7 +255,12 @@ def scrape_sportwettenvergleich_prognose():
 
                 for li in ul.find_all("li"):
                     date_elem = li.find("small")
-                    date = date_elem.text.strip() if date_elem else "Unbekanntes Datum"
+                    date_time = date_elem.text.strip() if date_elem else "Unbekanntes Datum"
+                    cleaned_date = date_time.replace("Uhr", "").strip()
+                    date, kickoff_time = cleaned_date.split(" ")
+
+                    #if date != "Unbekanntes Datum":
+                        
 
                     left_team_elem = li.find("strong", class_="left")
                     left_team = left_team_elem.text.strip() if left_team_elem else "?"
@@ -264,10 +269,18 @@ def scrape_sportwettenvergleich_prognose():
                     right_team = right_team_elem.text.strip() if right_team_elem else "?"
 
                     score_elem = li.find("span", class_="score_sidebar played") or li.find("span", class_="score_sidebar")
-                    score = score_elem.text.strip() if score_elem else "?"
+                    score_raw = score_elem.text.strip() if score_elem else "?"
+                    score = score_raw.replace(" ","").strip()
+                 
+                    tipps.append({
+                        "home_team": left_team,
+                        "away_team": right_team,
+                        "tip": score, # Wird auf sportwettenvwergleich.net auf das tatsächliche Ergebnis aktualisiert!
+                        "date": date,
+                        "kickoff_time": kickoff_time,
+                        "result": ""
 
-                    match_str = f"{date}: {left_team} - {right_team} {score}"
-                    tipps.append(match_str)
+                    })
 
     return tipps
 
@@ -464,5 +477,7 @@ if __name__ == "__main__":
     # A_bundesliga_tip_objects = create_match_objects_by_tip_list(bundesliga_tipps)
     # B_kicker_tip_objects = create_match_objects_by_tip_list(kicker_tipps)
     # C_buli_tipphilfe_objects = create_match_objects_by_tip_list(buli_tipphilfe_tipps)
+    # D_sportwettenvergleich_objects = create_match_objects_by_tip_list(sportwettenvergleich_tipps)
+
     print("done.")
     
