@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
+from match import Match
 
 def get_current_matchday():
     url = "https://www.kicker.de/bundesliga/spieltag"
@@ -31,7 +32,7 @@ def get_current_matchday():
         current_matchday = int(spieltag_match.group(1))
 
     return current_matchday
-            
+           
 
 def get_current_season():
     url = "https://www.kicker.de/bundesliga/spieltag"
@@ -256,7 +257,7 @@ def scrape_sportwettenvergleich_prognose():
 
     return tipps
 
-def scrape_ninetymin_prognose(current_matchday, current_saison):
+def scrape_ninety_min_prognose(current_matchday, current_saison):
     url  = f"https://www.90min.de/bundesliga-prognose-vorhersage-tipps-zum-{current_matchday}-spieltag-{current_saison}"
 
     headers = {
@@ -289,33 +290,39 @@ def scrape_ninetymin_prognose(current_matchday, current_saison):
                     tipps.append((teams, tip))
 
     return tipps
-    
-    
 
-
+def create_match_object():
+    match_1= Match("HSV", "Schalke 04", "3:1")
+    print(match_1)
+    
 if __name__ == "__main__":
 
     #matchday_and_season_short = get_current_matchday_and_season()
     current_saison = get_current_season()
     current_matchday = get_current_matchday()
 
-    # all_tipps = []
+    all_tipps = []
 
-    # kicker_tipps = scrape_kicker_prognose()
-    # bundesliga_tipps = scrape_bundesliga_prognose()    
-    # buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
-    # sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
-    ninetymin_tipps = scrape_ninetymin_prognose(current_matchday, current_saison)
+    kicker_tipps = scrape_kicker_prognose()
+    bundesliga_tipps = scrape_bundesliga_prognose()    
+    buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
+    sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
+    ninety_min_tipps = scrape_ninety_min_prognose(current_matchday, current_saison)
 
-    # all_tipps.append( kicker_tipps)
-    # all_tipps.append( bundesliga_tipps)
-    # all_tipps.append( buli_tipphilfe_tipps)   
-    # all_tipps.append(sportwettenvergleich_tipps)
+    all_tipps.append(kicker_tipps)
+    all_tipps.append(bundesliga_tipps)
+    all_tipps.append(buli_tipphilfe_tipps)   
+    all_tipps.append(sportwettenvergleich_tipps)
+    all_tipps.append(ninety_min_tipps)
+
+    match_x = create_match_object()
+
+    print("done.")
     
     #print(current_matchday,current_saison)
 
-    for match, tip in ninetymin_tipps:
-        print(f"Spiel: {match} - Tipp: {tip}")
+#    for match, tip in ninety_min_tipps:
+#        print(f"Spiel: {match} - Tipp: {tip}")
 
 
 #    for tipp in sportwettenvergleich_tipps:
