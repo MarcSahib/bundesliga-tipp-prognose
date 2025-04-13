@@ -215,9 +215,13 @@ def scrape_buli_tipphilfe_prognose():
                             break
 
                 tipps.append({
-                    "heimteam": heim,
-                    "auswaertsteam": auswaerts,
-                    "tipp": tipp
+                    "home_team": heim,
+                    "away_team": auswaerts,
+                    "tip": tipp,
+                    "date": "",
+                    "kickoff_time": "",
+                    "result": ""
+
                 })
 
     return tipps
@@ -445,8 +449,8 @@ if __name__ == "__main__":
 
     all_tipps = []
 
-    bundesliga_tipps = scrape_bundesliga_prognose()    
-    kicker_tipps = scrape_kicker_prognose()
+    # bundesliga_tipps = scrape_bundesliga_prognose()    
+    # kicker_tipps = scrape_kicker_prognose()
     # buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
     # sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
     # ninety_min_tipps = scrape_ninety_min_prognose(current_matchday, current_saison)
@@ -457,8 +461,8 @@ if __name__ == "__main__":
     # all_tipps.append(sportwettenvergleich_tipps)
     # all_tipps.append(ninety_min_tipps)
 
-    A_bundesliga_tip_objects = create_match_objects_by_tip_list(bundesliga_tipps)
-    B_kicker_tip_objects = create_match_objects_by_tip_list(kicker_tipps)
-
+    # A_bundesliga_tip_objects = create_match_objects_by_tip_list(bundesliga_tipps)
+    # B_kicker_tip_objects = create_match_objects_by_tip_list(kicker_tipps)
+    # C_buli_tipphilfe_objects = create_match_objects_by_tip_list(buli_tipphilfe_tipps)
     print("done.")
     
