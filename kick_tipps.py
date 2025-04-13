@@ -306,15 +306,30 @@ def scrape_ninety_min_prognose(current_matchday, current_saison):
             teams_span = game.find('span', class_='tagStyle_z4kqwb-o_O-numberStyle_bdr0ip-o_O-tagStyle_1igopqi')
             if teams_span:
                 game_number = teams_span.get_text(strip=True).replace('.', '')  # Spielnummer (1, 2, 3,...)
-                teams = game.get_text(strip=True).replace(f"{game_number}. ", "")  # Die Teams (z.B. "VfL Wolfsburg - RB Leipzig")
-                
+                teams_raw = game.get_text(strip=True).replace(f"{game_number}. ", "")  # Die Teams (z.B. "VfL Wolfsburg - RB Leipzig")
+                teams = teams_raw.replace(f"{game_number}.","")
+                parts = teams.split("-")
+                if len(parts) !=2:
+                    raise ValueError("Ungültiges Format. Erwartet wird 'TeamA - TeamB'")
+                home_team = parts[0].strip()
+                away_team = parts[1].strip()
+
                 # Tipp extrahieren
                 tip_strong = game.find_next('strong', text=lambda x: x and 'Tipp:' in x)
                 if tip_strong:
-                    tip = tip_strong.get_text(strip=True).replace('Tipp: ', '')  # Den Tipp extrahieren, z.B. "1-2"
+                    tip_raw = tip_strong.get_text(strip=True).replace('Tipp: ', '')  # Den Tipp extrahieren, z.B. "1-2"
+                    tip = tip_raw.replace("-",":")
                     
                     # Tipp und Spielpaarung speichern
-                    tipps.append((teams, tip))
+                    tipps.append({
+                        "home_team": home_team,
+                        "away_team": away_team,
+                        "tip": tip, # Wird auf sportwettenvwergleich.net auf das tatsächliche Ergebnis aktualisiert!
+                        "date": "",
+                        "kickoff_time": "",
+                        "result": ""
+
+                    })
 
     return tipps
 
@@ -456,28 +471,28 @@ def create_match_objects_by_tip_list(tip_list):
 
 if __name__ == "__main__":
 
-    #matchday_and_season_short = get_current_matchday_and_season()
     current_saison = get_current_season()
     current_matchday = get_current_matchday()
 
+    bundesliga_tipps = scrape_bundesliga_prognose()    
+    kicker_tipps = scrape_kicker_prognose()
+    buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
+    sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
+    ninety_min_tipps = scrape_ninety_min_prognose(current_matchday, current_saison)
+
+    A_bundesliga_tip_objects = create_match_objects_by_tip_list(bundesliga_tipps)
+    B_kicker_tip_objects = create_match_objects_by_tip_list(kicker_tipps)
+    C_buli_tipphilfe_objects = create_match_objects_by_tip_list(buli_tipphilfe_tipps)
+    D_sportwettenvergleich_objects = create_match_objects_by_tip_list(sportwettenvergleich_tipps)
+    E_ninety_min_tipps_objects = create_match_objects_by_tip_list(ninety_min_tipps)
+
     all_tipps = []
 
-    # bundesliga_tipps = scrape_bundesliga_prognose()    
-    # kicker_tipps = scrape_kicker_prognose()
-    # buli_tipphilfe_tipps = scrape_buli_tipphilfe_prognose()
-    # sportwettenvergleich_tipps = scrape_sportwettenvergleich_prognose()
-    # ninety_min_tipps = scrape_ninety_min_prognose(current_matchday, current_saison)
-
-    # all_tipps.append(kicker_tipps)
-    # all_tipps.append(bundesliga_tipps)
-    # all_tipps.append(buli_tipphilfe_tipps)   
-    # all_tipps.append(sportwettenvergleich_tipps)
-    # all_tipps.append(ninety_min_tipps)
-
-    # A_bundesliga_tip_objects = create_match_objects_by_tip_list(bundesliga_tipps)
-    # B_kicker_tip_objects = create_match_objects_by_tip_list(kicker_tipps)
-    # C_buli_tipphilfe_objects = create_match_objects_by_tip_list(buli_tipphilfe_tipps)
-    # D_sportwettenvergleich_objects = create_match_objects_by_tip_list(sportwettenvergleich_tipps)
+    all_tipps.append(kicker_tipps)
+    all_tipps.append(bundesliga_tipps)
+    all_tipps.append(buli_tipphilfe_tipps)   
+    all_tipps.append(sportwettenvergleich_tipps)
+    all_tipps.append(ninety_min_tipps)
 
     print("done.")
     
