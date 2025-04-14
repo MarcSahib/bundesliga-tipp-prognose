@@ -455,8 +455,6 @@ def create_match_objects_by_tip_list(tip_list):
         if "Wolfsburg" in tip["away_team"]:
             tip["away_team"] = "VfL Wolfsburg"
      
-
-
         if tip["home_team"] not in erste_bundesliga_teams:
             print(f'Home Team not found: {tip["home_team"]}')
         if tip["away_team"] not in erste_bundesliga_teams:
