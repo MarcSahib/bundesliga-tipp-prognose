@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def scrape_kicker_prognose():
     
-    url = "https://www.kicker.de/die-bundesliga-prognose-unsere-expertentipps-993443/artikel"
+    url = "https://www.kicker.de/die-bundesliga-prognose-unsere-expertentipps-993443/artikel" # hat scheinbar keine eindeutige URL für Spieltag + saison
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

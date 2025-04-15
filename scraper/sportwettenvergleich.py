@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def scrape_sportwettenvergleich_prognose():
     
-    url  = "https://www.sportwettenvergleich.net/kickform/bundesliga-spieltagstipps"
+    url  = "https://www.sportwettenvergleich.net/kickform/bundesliga-spieltagstipps" # besitzt /30/ -> /<Spieltag>/
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def scrape_buli_tipphilfe_prognose():
     
-    url = "https://www.buli-tipphilfe.de/"
+    url = "https://www.buli-tipphilfe.de/" # hat scheinbar keine eindeutige URL für spieltag/saison , sollte noch auf https://www.buli-tipphilfe.de/1-bundesliga-tipps geändert werden. 
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

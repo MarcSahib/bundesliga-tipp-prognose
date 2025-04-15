@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def scrape_bundesliga_prognose():
    
-    url = "https://www.bundesliga-prognose.de/"
+    url = "https://www.bundesliga-prognose.de/" # besitzt "/1/2024/29/" -> /<Liga>/Saison/Spieltag
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
