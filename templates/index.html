@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Bundesliga Prognosen</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+<div class="container mt-5">
+    <h1 class="mb-4">🔍 Bundesliga Prognosen</h1>
+    <form action="/scrape" method="post">
+        <button class="btn btn-primary mb-3">Tipps abrufen</button>
+    </form>
+
+    {% if match_objects %}
+        {% for source, matches in match_objects.items() %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <strong>{{ source|upper }}</strong>
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for match in matches %}
+                        <li class="list-group-item">{{ match }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    {% endif %}
+</div>
+</body>
+</html>

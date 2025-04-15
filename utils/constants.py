@@ -20,3 +20,24 @@ BUNDESLIGA_TEAMS = [
     "Holstein Kiel"
     
 ]
+
+BUNDESLIGA_TEAM_CITIES = [
+    ["augsburg"],
+    ["bayern", "münchen"],
+    ["bochum"],
+    ["bremen"],
+    ["dortmund", "bvb"],
+    ["frankfurt"],
+    ["freiburg"],
+    ["gladbach"],
+    ["heidenheim"],
+    ["hoffenheim"],
+    ["kiel"],
+    ["leipzig"],
+    ["leverkusen"],
+    ["mainz"],
+    ["pauli", "st. pauli"],
+    ["stuttgart"],
+    ["union", "berlin"],
+    ["wolfsburg"]
+]
