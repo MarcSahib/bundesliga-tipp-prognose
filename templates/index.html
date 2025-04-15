@@ -24,6 +24,8 @@
                             <tr>
                                 <th>Heimteam</th>
                                 <th>Auswärtsteam</th>
+                                <th hidden>Tore Heimteam Tipp</th>
+                                <th hidden>Tore Auswärtsteam Tipp</th>
                                 <th>Tipp</th>
                                 <th>Ergebnis</th>
                                 <th>Datum</th>
@@ -35,6 +37,8 @@
                                 <tr>
                                     <td>{{ match.get_home_team() }}</td>
                                     <td>{{ match.get_away_team() }}</td>
+                                    <td hidden>{{ match.get_home_goals_tip() }}</td>
+                                    <td hidden>{{ match.get_away_goals_tip() }}</td>
                                     <td>{{ match.get_tip() }}</td>
                                     <td>{{ match.get_result() or "-" }}</td>
                                     <td>{{ match.get_date() or "-" }}</td>
