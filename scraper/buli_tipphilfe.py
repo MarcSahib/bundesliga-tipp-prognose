@@ -46,9 +46,13 @@ def scrape_buli_tipphilfe_prognose():
                             tipp = all_divs[i + 1].get_text(strip=True)
                             break
 
+                home_goals_tip, away_goals_tip = tipp.split(":")
+
                 tipps.append({
                     "home_team": heim,
                     "away_team": auswaerts,
+                    "home_goals_tip": home_goals_tip,
+                    "away_goals_tip": away_goals_tip,
                     "tip": tipp,
                     "date": "",
                     "kickoff_time": "",

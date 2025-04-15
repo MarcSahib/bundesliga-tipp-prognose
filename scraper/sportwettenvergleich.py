@@ -48,10 +48,12 @@ def scrape_sportwettenvergleich_prognose():
                     score_elem = li.find("span", class_="score_sidebar played") or li.find("span", class_="score_sidebar")
                     score_raw = score_elem.text.strip() if score_elem else "?"
                     score = score_raw.replace(" ","").strip()
-                 
+                    home_goals_tip, away_goals_tip = score.split(":")
                     tipps.append({
                         "home_team": left_team,
                         "away_team": right_team,
+                        "home_goals_tip": home_goals_tip,
+                        "away_goals_tip": away_goals_tip,
                         "tip": score, # Wird auf sportwettenvwergleich.net auf das tatsächliche Ergebnis aktualisiert!
                         "date": date,
                         "kickoff_time": kickoff_time,

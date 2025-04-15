@@ -44,12 +44,15 @@ def scrape_bundesliga_prognose():
                     auswärtsteam_short_name = cells[5].get_text(strip=True)                                    
                     result = cells[6].get_text(strip=True)
                     tip = cells[7].get_text(strip=True)
+                    home_goals_tip, away_goals_tip = tip.split(":")
 
                     # Nur rot markierte Tipps extrahieren
                     if 'color: red' in cells[7].get('style', ''):
                         tipps.append({
                             'home_team': home_team,
                             'away_team': away_team,
+                            'home_goals_tip': home_goals_tip,
+                            'away_goals_tip': away_goals_tip,
                             'tip': tip, 
                             'date': date,
                             'kickoff_time': kickoff_time,

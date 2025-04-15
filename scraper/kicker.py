@@ -39,11 +39,14 @@ def scrape_kicker_prognose():
         next_strong = h2.find_next("strong")
         if next_strong and "Unser Tipp:" in next_strong.get_text():
             tipp_text = next_strong.get_text(strip=True).replace("Unser Tipp:", "").strip()
+            home_goals_tip, away_goals_tip = tipp_text.split(":")
             tips.append({
                 "date": "",
                 "kickoff_time": "",
                 "home_team": home_team, 
                 "away_team": away_team,
+                "home_goals_tip": home_goals_tip,
+                "away_goals_tip": away_goals_tip,
                 "match": title,
                 "tip": tipp_text,
                 "result": ""

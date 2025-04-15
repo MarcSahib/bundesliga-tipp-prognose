@@ -25,6 +25,8 @@ def create_match_objects_by_tip_list(tip_list):
         match = Match(
             tip["home_team"], 
             tip["away_team"], 
+            tip["home_goals_tip"],
+            tip["away_goals_tip"],
             tip["tip"], 
             tip["date"], 
             tip["kickoff_time"], 

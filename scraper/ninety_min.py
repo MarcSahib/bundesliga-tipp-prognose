@@ -38,11 +38,13 @@ def scrape_ninety_min_prognose(current_matchday, current_saison):
                 if tip_strong:
                     tip_raw = tip_strong.get_text(strip=True).replace('Tipp: ', '')  # Den Tipp extrahieren, z.B. "1-2"
                     tip = tip_raw.replace("-",":")
-                    
+                    home_goals_tip, away_goals_tip = tip.split(":")
                     # Tipp und Spielpaarung speichern
                     tipps.append({
                         "home_team": home_team,
                         "away_team": away_team,
+                        "home_goals_tip": home_goals_tip, 
+                        "away_goals_tip": away_goals_tip,
                         "tip": tip, # Wird auf sportwettenvwergleich.net auf das tatsächliche Ergebnis aktualisiert!
                         "date": "",
                         "kickoff_time": "",

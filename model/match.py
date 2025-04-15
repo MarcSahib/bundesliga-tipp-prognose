@@ -1,13 +1,45 @@
 class Match: # match = Match(tip["home_team"], tip["away_team"], tip["date"], tip["kickoff_time"], tip["result"] )
-    def __init__(self, home_team, away_team, tip, date=None, kickoff_time=None, result=None):
+    def __init__(self, home_team, away_team, home_goals_tip, away_goals_tip, tip, date=None, kickoff_time=None, result=None):
 
         self._home_team = home_team
         self._away_team = away_team
+        self._home_goals_tip = home_goals_tip
+        self._away_goals_tip = away_goals_tip
         self._tip = tip
         self._date = date
         self._kickoff_time = kickoff_time
         self._result = result
         
+
+    def get_home_team(self):
+        return self._home_team
+    
+    def set_home_team(self, home_team):
+        self._home_team = home_team
+
+    def get_away_team(self):
+        return self._away_team
+    
+    def set_away_team(self, away_team):
+        self._away_team = away_team
+
+    def get_home_goals_tip(self):
+        return self._home_goals_tip
+    
+    def set_home_goals_tip(self, home_goals_tip):
+        self._home_goals_tip = home_goals_tip
+
+    def get_away_goals_tip(self):
+        return self._away_goals_tip
+    
+    def set_away_goals_tip(self, away_goals_tip):
+        self._away_goals_tip = away_goals_tip        
+
+    def get_tip(self):
+        return self._tip
+    
+    def set_tip(self, tip):
+        self._tip = tip
 
     def get_date(self):
         return self._date
@@ -20,24 +52,6 @@ class Match: # match = Match(tip["home_team"], tip["away_team"], tip["date"], ti
     
     def set_kickoff_time(self, kickoff_time):
         self._kickoff_time = kickoff_time
-
-    def get_home_team(self):
-        return self._home_team
-    
-    def set_home_team(self, home_team):
-        self._home_team = home_team
-    
-    def get_away_team(self):
-        return self._away_team
-    
-    def set_away_team(self, away_team):
-        self._away_team = away_team
-    
-    def get_tip(self):
-        return self._tip
-    
-    def set_tip(self, tip):
-        self._tip = tip
 
     def get_result(self):
         return self._result
